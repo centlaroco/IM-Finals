@@ -1,0 +1,88 @@
+@media only screen and (max-width:  640px){ 
+    .login-card{
+        display: flex;
+        flex-direction: column;
+        justify-content:center;
+        align-items: center;
+        width: 100%;
+        max-width: 420px;
+        background: white;
+        border-radius: 12px;
+    }
+
+    h2{
+        font-weight: bold;
+        font-size: 42px;
+    }
+
+    .btn-primary{
+        background: #7B9ACC;
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover{
+        background: #7B9ACC;
+    }
+
+    .pass-container{
+        position: relative;
+    }
+
+    .pass-container svg{
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+
+    #hide-password{
+        display: none;
+    }
+
+    a{
+        color: black;
+        font-weight: 600;
+    }
+
+    .login-form{
+        margin-top: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .login-or-register{
+            display:flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-or-register::before{
+            content: "";
+            width: 100px;
+            height: 1px;
+            flex: 1;
+            background: #ccc;
+            margin-right: 10px;
+        }
+        .login-or-register::after{
+            content: "";
+            width: 100px;
+            height: 1px;
+            flex: 1;
+            background: #ccc;
+            margin-left: 10px;
+        }
+    .login-or-register p{
+        margin:0 auto;
+    }
+        
+    .header{
+        flex: 1; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 6rem;
+    }
+}

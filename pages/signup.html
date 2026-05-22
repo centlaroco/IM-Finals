@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/style.css">
+    <title>Register</title>
+</head>
+<body>
+    <section class="section-1 w-100">
+        <div class="header text-center d-flex flex-column justify-content-center pb-5">
+            <h2 class="fw-bolder">Register</h2>
+            <p>Create your account to continue</p>
+        </div>
+        <div class="form p-4 w-100">
+            <form action="/signup" method="POST">
+                <!-- fullname -->
+                <div class="mb-3">
+                    <label class="form-label">Enter your full Name</label>
+                    <input 
+                        id="name"
+                        type="text"
+                        name="fullName"
+                        class="form-control"
+                        placeholder="Enter your fullname"
+                        required
+                    >
+                </div>
+
+                <!-- email -->
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input 
+                        id="email"
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        placeholder="Enter your email"
+                        required
+                    >
+                </div>
+
+                <!-- username -->
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input 
+                        id="username"
+                        type="text"
+                        name="username"
+                        class="form-control"
+                        placeholder="Enter your username"
+                        required
+                    >
+                </div>
+
+                <!-- address -->
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <input 
+                        type="text"
+                        name="address"
+                        class="form-control"
+                        placeholder="Enter your address"
+                        required
+                    >
+                </div>
+                
+                <!-- contact no. -->
+                <div class="mb-3">
+                    <label class="form-label">Contact no.</label>
+                    <input 
+                        type="number"
+                        name="contact_no"
+                        class="form-control"
+                        placeholder="Enter your Contact no."
+                        required
+                    >
+                </div>
+
+                <!-- new pass -->
+                <div class="password-container mb-3">
+                    <label class="form-label">New Password</label>
+                    <input 
+                        id="pwd"
+                        name="password"
+                        type="password"
+                        class="form-control"
+                        placeholder="Enter your new password"
+                        required
+                    >
+                    <!-- showpassword -->
+                    <svg 
+                        id="showpass"
+                        xmlns="http://www.w3.org/2000/svg" 
+                        height="24px" 
+                        viewBox="0 -960 960 960" 
+                        width="24px" 
+                        fill="#434343"
+                        onclick="myPass()"
+                    >
+                        <path d="M607.5-372.5Q660-425 660-500t-52.5-127.5Q555-680 480-680t-127.5 52.5Q300-575 300-500t52.5 127.5Q405-320 480-320t127.5-52.5Zm-204-51Q372-455 372-500t31.5-76.5Q435-608 480-608t76.5 31.5Q588-545 588-500t-31.5 76.5Q525-392 480-392t-76.5-31.5ZM214-281.5Q94-363 40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200q-146 0-266-81.5ZM480-500Zm207.5 160.5Q782-399 832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280q113 0 207.5-59.5Z"/>
+                    </svg>
+
+                    <!-- hidepass -->
+                     <svg 
+                        id="hidepass"
+                        xmlns="http://www.w3.org/2000/svg" 
+                        height="24px" 
+                        viewBox="0 -960 960 960" 
+                        width="24px" 
+                        fill="#434343"
+                        onclick="myPass()">
+                        <path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/>
+                    </svg>
+                </div>
+                
+                <button class="btn btn-primary w-100 mt-3" type="submit" onclick="notice(event)" style="color: #FCF6F5;">Register</button>
+
+                <div id="warning-overlay" >
+                    <div id="warn">
+                        <p class="text-danger fs-4 ">Fill in the form to register</p>
+                        <p class="text-muted">You cant can't create a new account unless you're registered.</p>
+                        <button type="submit" class="btn btn-primary" onclick="warningClose()"><a href="" class="text-decoration-none" style="color: #FCF6F5">Okay</a></button>
+                    </div>
+                </div>
+            </form>
+
+            <hr class="border-bottom border-dark mt-4 mb-4" style="height: 1px;">
+
+            <p class="text-center"><a href="/login" class="border-none text-decoration-none text-dark fw-bold ">Login</a></p>
+        </div>
+    </section>
+
+    <script>
+        function myPass(){
+            const password = document.getElementById('pwd');
+            const showIcon = document.getElementById('showpass');
+            const hideIcon = document.getElementById('hidepass');
+
+            if(password.type === "password"){
+
+                password.type = "text";
+
+                showIcon.style.display = "none";
+                hideIcon.style.display = "block";
+            } else{
+                password.type = "password";
+
+                showIcon.style.display = "block";
+                hideIcon.style.display = "none";
+            }
+        }
+
+        function notice(event){
+
+            event.preventDefault();
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const username = document.getElementById("username").value;
+            const overlay = document.getElementById("warning-overlay");
+            if(name === "" || email === "" || username === ""){
+                overlay.style.display = "flex";
+                return false;
+            }
+
+            event.target.form.submit();
+        }
+        
+        function warningClose(){
+            document.getElementById("warning-overlay").style.display = "none";
+        }
+    </script>
+</body>
+</html>

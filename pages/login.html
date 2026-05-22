@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="/images/logo.png">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/style.css">
+    <title>Login</title>
+
+</head>
+
+<body>
+
+    <section class="login-card">
+
+        <div class="header text-center d-flex flex-column justify-content-center">
+            <h2>Login</h2>
+            <p class="text-muted">You must login into your account to continue</p>
+        </div>
+
+        <div class="login-form gap-3 w-100 p-4">
+            <form>
+                <!-- get the username -->
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input 
+                        type="text"
+                        class="form-control"
+                        placeholder="Enter your username"
+                        required
+                    >
+                </div>
+
+                <!-- enter password -->
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+
+                    <div class="pass-container">
+                        <input 
+                            type="password"
+                            id="password"
+                            class="form-control"
+                            placeholder="Enter your password"
+                            required
+                        >
+
+                        <!-- SHOW PASSWORD -->
+                        <svg id="show-password"
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#000"
+                            onclick="togglePass()">
+
+                            <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Z"/>
+                        </svg>
+
+                        <!-- HIDE PASSWORD -->
+                        <svg id="hide-password"
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#000"
+                            onclick="togglePass()">
+
+                            <path d="m644-428-58-58q9-47-27-88t-93-32l-58-58Zm148 148-58-58q38-29 67.5-63.5T844-500q-50-94-139-147t-193-53q-41 0-81 8.5T353-666l-58-58q43-20 89-32t96-12q146 0 266 81.5T920-500q-17 43-43 82.5T792-280ZM792-56 56-792l56-56 736 736-56 56Z"/>
+                        </svg>
+
+                    </div>
+                </div>
+
+                <!-- REMEMBER + FORGOT -->
+                <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+
+                    <div class="form-check">
+                        <input 
+                            class="form-check-input"
+                            type="checkbox"
+                            id="remember"
+                        >
+
+                        <label 
+                            class="form-check-label"
+                            for="remember">Remember me
+                        </label>
+                    </div>
+
+                    <a href="/forgotpass" class="text-decoration-none">Forgot Password?</a>
+                </div>
+
+                <!-- BUTTON -->
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+
+            </form>
+            <div class="login-or-register">
+                <span>or</span>
+            </div>
+            
+
+            <p class="text-center mb-0">Not registered?
+                <a href="/signup" class="text-decoration-none">Register</a>
+            </p>
+        </div>
+    </section>
+
+    <script>
+        function togglePass(){
+            const password = document.getElementById('password');
+            const showPassword = document.getElementById('show-password');
+            const hidePassword = document.getElementById('hide-password');
+            
+            if(password.type === "password"){
+                password.type = "text";
+
+                showPassword.style.display = "none";
+                hidePassword.style.display = "block";
+            }
+            else{
+                password.type = "password";
+
+                showPassword.style.display = "block";
+                hidePassword.style.display = "none";
+            }
+            
+        }
+    </script>
+</body>
+</html>
