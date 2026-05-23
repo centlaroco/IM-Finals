@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+
+:root {
+    --bg: #FCF6F5;
+    --card: rgba(255, 255, 255, 0.9);
+    --border: rgba(0, 0, 0, 0.08);
+    --text: #111111;
+    --muted: #777777;
+    --accent: #FCF6F5;
+    --danger: #ff4d67;
+    --glass: #ffffff;
+}
+
+body.dark-mode {
+    --bg: #0f0f10;
+    --card: rgba(30, 30, 30, 0.9);
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #ffffff;
+    --muted: #a1a1aa;
+    --glass: #1e1e1e;
+}
+
+* {
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box; 
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    padding-top: 60px; /* 🛠️ ADD THIS LINE TO REMOVE THE TOP GAP */
+    background-color: var(--bg);
+    color: var(--text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+    overflow-y: auto;
+}
+
+/* Glassmorphism Structural Modifiers */
+header {
+    background: var(--glass);
+    border-bottom: 1px solid var(--border);
+    height: 60px;
+    z-index: 1000;
+}
+
+header svg {
+    fill: var(--text);
+}
+
+.composer, .post {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    overflow-wrap: break-word;  /* Standard browser rule to break long words */
+    word-wrap: break-word;      /* Legacy browser support */
+    word-break: break-word;     /* Ensures layout boundaries are strictly respected */
+}
+
+/* Fixed Navigation Elements */
+.mobile-nav {
+    position: fixed; /* Keeps it strictly anchored above layout bounds */
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 420px;
+    height: 65px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    z-index: 999;
+}
+
+.mobile-nav button svg {
+    fill: var(--text);
+}
+
+/* App Layout Elements */
+.avatar {
+    width: 42px;
+    height: 42px;
+    background: #111;
+    color: white;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+textarea {
+    background: #ececec;
+    resize: none;
+    outline: none;
+    min-height: 44px;
+    max-height: 44px;
+    overflow-y: hidden;
+}
+
+.action-btn.liked {
+    color: var(--danger) !important;
+}
+
+.action-btn.liked svg {
+    fill: var(--danger) !important;
+}
+
+.image-preview {
+    position: relative;
+}
+
+.remove-preview {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
+/* Dropdown Position Patch */
+.dropdown-menu.custom-dropdown {
+    display: none;
+    position: absolute;
+    top: 55px;
+    right: 16px;
+    width: 180px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    z-index: 1000;
+}
+
+.dropdown-menu.custom-dropdown.show {
+    display: flex !important;
+}
+
+/* Responsive Modifications */
+@media(max-width:640px){
+    .post img, .image-preview img {
+        max-height: 260px;
+        object-fit: cover;
+    }
+
+    
+    
+}

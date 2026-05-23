@@ -9,19 +9,19 @@ xl: 1280px -- larger wide desktop size
 @import url(signin.css);
 @import url(login.css);
 @import url(forgotpass.css);
-body{
+@import url(home.css);
+@import url(profile.css);
+body {
     margin: 0;
     padding: 0;
-    background: #FCF6F5;
-    color: #111;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-}
+    color: var(--text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+    overflow-y: auto;
+}   
 
 *{
 
     font-family: 'Inter', sans-serif;
     box-sizing: border-box; 
-}
+} 

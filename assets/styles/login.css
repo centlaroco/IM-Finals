@@ -1,88 +1,113 @@
-@media only screen and (max-width:  640px){ 
-    .login-card{
-        display: flex;
-        flex-direction: column;
-        justify-content:center;
-        align-items: center;
-        width: 100%;
-        max-width: 420px;
-        background: white;
-        border-radius: 12px;
-    }
+.login-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh; 
+    margin: 0 auto;
+    background: transparent !important; 
+    border-radius: 0 !important;       
+    border: none !important;     
+    padding: 0 16px;                 
+}
 
-    h2{
-        font-weight: bold;
-        font-size: 42px;
-    }
+.login-card .header {
+    flex: 1; /* Absorbs all leftover space, forcing the form down */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Keeps the text beautifully centered in that top region */
+    align-items: center;
+    text-align: center;
+    padding: 4rem 1rem 2rem 1rem;
+}
 
-    .btn-primary{
-        background: #7B9ACC;
-        border: none;
-        padding: 12px;
-        font-weight: 600;
-    }
+.login-card h2 {
+    font-weight: bold;
+    font-size: 42px;
+}
 
-    .btn-primary:hover{
-        background: #7B9ACC;
-    }
+/* The form section sits comfortably at the very base */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: auto; /* Hard-anchors the form container to the bottom boundary */
+    padding-bottom: 40px; /* Safe padding space from the absolute bottom edge/home indicators */
+}
 
-    .pass-container{
-        position: relative;
-    }
+/* Yellow Button Styles from your reference image */
+.login-card .btn-primary {
+    background-color: #7B9ACC !important;
+    border: none !important;
+    border-radius: 8px !important;       
+    padding: 12px;
+    font-weight: 600;
+    color: #000000 !important;           
+}
 
-    .pass-container svg{
-        position: absolute;
-        top: 50%;
-        right: 12px;
-        transform: translateY(-50%);
-        cursor: pointer;
-    }
+.login-card .btn-primary:hover,
+.login-card .btn-primary:focus {
+    background-color: #E5A400 !important;
+}
 
-    #hide-password{
-        display: none;
-    }
+/* Form layout utility alignments */
+.pass-container {
+    position: relative;
+}
 
-    a{
-        color: black;
-        font-weight: 600;
-    }
+.pass-container svg {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
 
-    .login-form{
-        margin-top: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        .login-or-register{
-            display:flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-or-register::before{
-            content: "";
-            width: 100px;
-            height: 1px;
-            flex: 1;
-            background: #ccc;
-            margin-right: 10px;
-        }
-        .login-or-register::after{
-            content: "";
-            width: 100px;
-            height: 1px;
-            flex: 1;
-            background: #ccc;
-            margin-left: 10px;
-        }
-    .login-or-register p{
-        margin:0 auto;
+#hide-password {
+    display: none;
+}
+
+.login-card a {
+    color: #111111;
+    font-weight: 600;
+}
+
+/* Decorative 'or' splitter styling */
+.login-or-register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-or-register::before {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: #ccc;
+    margin-right: 10px;
+}
+
+.login-or-register::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: #ccc;
+    margin-left: 10px;
+}
+
+/* Responsive Desktop Optimization */
+@media only screen and (min-width: 641px) {
+    .login-card {
+        min-height: auto;
+        margin: 60px auto;
+        background: transparent !important;
     }
-        
-    .header{
-        flex: 1; 
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 6rem;
+    .login-form {
+        margin-top: 20px;
+        padding-bottom: 0;
+    }
+    .login-card .header {
+        flex: none;
+        padding: 2rem 0;
     }
 }
