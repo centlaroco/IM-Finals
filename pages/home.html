@@ -93,6 +93,46 @@
                 Logout
             </button>
 
+            <!-- LOGOUT MODAL -->
+            <div id="logoutModal" class="logout-modal">
+
+                <div class="logout-box">
+
+                    <!-- TITLE -->
+                    <h2 class="logout-title fs-4">
+                        Do you want to log out?
+                    </h2>
+
+                    <!-- TEXT -->
+                    <p class="logout-text">
+                        Your current session will end.
+                    </p>
+
+                    <!-- BUTTONS -->
+                    <div class="logout-buttons">
+
+                        <!-- YES -->
+                        <button
+                            class="logout-yes"
+                            onclick="confirmLogout()">
+
+                            Yes
+                        </button>
+
+                        <!-- NO -->
+                        <button
+                            class="logout-no"
+                            onclick="closeLogoutModal()">
+
+                            No
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
     </header>
@@ -118,7 +158,8 @@
                 <!-- TEXTAREA -->
                 <textarea
                     id="postInput"
-                    class="form-control rounded-pill border-0 px-3 py-2 fs-6">
+                    class="form-control rounded-pill border-0 px-3 py-2 fs-6"
+                    placeholder="Nag unsa ka?">
                 </textarea>
 
             </div>
@@ -145,7 +186,9 @@
                     type="button"
                     onclick="document.getElementById('mediaInput').click()">
 
-                    📷
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+                        <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
+                    </svg>
                     <span class="fs-6 fw-semibold">
                         Upload
                     </span>
@@ -168,11 +211,31 @@
         <div id="posts"
             class="w-100">
         </div>
-
     </main>
 
+    <section
+        id="searchPage"
+        class="d-none container px-3 pt-3 pb-5"
+        style="max-width:600px;">
+
+        <div class="search-box p-3 rounded-4 shadow-sm">
+
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control mb-2"
+                placeholder="Search username..."
+            >
+
+            <!-- RESULTS -->
+            <div id="searchResult" class="mt-3"></div>
+
+        </div>
+
+    </section>
+
     <!-- NAVIGATION -->
-    <nav class="mobile-nav rounded-pill shadow d-flex justify-content-around align-items-center">
+    <nav class="mobile-nav fixed-bottom mx-auto mb-3 bg-white bg-opacity-75 border d-flex align-items-center justify-content-around shadow rounded-pill">
 
         <!-- HOME -->
         <button
@@ -180,7 +243,9 @@
             style="width:48px; height:48px;"
             onclick="showPage('home')">
 
-            🏠
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+                <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/>
+            </svg>
 
         </button>
 
@@ -190,7 +255,9 @@
             style="width:48px; height:48px;"
             onclick="showPage('search')">
 
-            🔍
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+                <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
+            </svg>
 
         </button>
 
@@ -217,52 +284,85 @@
     <script>
 
         // POSTS CONTAINER
-        const postsContainer =
-            document.getElementById('posts');
+        const postsContainer = document.getElementById('posts');
 
         // INPUT
-        const postInput =
-            document.getElementById('postInput');
+        const postInput = document.getElementById('postInput');
 
         // IMAGE INPUT
-        const mediaInput =
-            document.getElementById('mediaInput');
+        const mediaInput = document.getElementById('mediaInput');
 
         // PREVIEW
-        const preview =
-            document.getElementById('imagePreview');
+        const preview = document.getElementById('imagePreview');
 
         // SELECTED IMAGE
         let selectedImage = null;
 
-        // USERNAME
-        const params =
-            new URLSearchParams(window.location.search);
+        mediaInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
 
-        const username =
-            params.get('username') || "User";
+            if (!file) return;
+
+            // Check file type
+            if (!file.type.startsWith("image/")) {
+                alert("Please select a valid image file");
+                mediaInput.value = "";
+                return;
+            }
+
+            // Check file size (2MB limit)
+            if (file.size > 2 * 1024 * 1024) {
+                alert("Image too large! Max 2MB allowed.");
+                mediaInput.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                selectedImage = event.target.result;
+                console.log("Image loaded successfully"); // Debug
+
+                preview.innerHTML = `
+                    <div class="position-relative mt-2">
+                        <img src="${selectedImage}"
+                            class="img-fluid rounded-3 w-100 object-fit-cover"
+                            style="max-height:250px;">
+                        <button class="btn btn-danger position-absolute top-0 end-0 m-2 rounded-circle"
+                            onclick="removeImage()">
+                            ✖
+                        </button>
+                    </div>
+                `;
+            };
+
+            reader.onerror = function() {
+                console.log("Error reading file");
+                alert("Error reading file");
+            };
+
+            reader.readAsDataURL(file);
+        });
+        // USERNAME
+        const params = new URLSearchParams(window.location.search);
+
+        const username = params.get('username') || "User";
 
         // DEFAULT IMAGE
-        const defaultProfile =
-            "/assets/images/profile.jpg";
+        const defaultProfile = "/assets/images/profile.jpg";
 
         // SAVED PROFILE IMAGE
-        const savedProfileImage =
-            localStorage.getItem(`profileImage_${username}`);
+        const savedProfileImage = localStorage.getItem(`profileImage_${username}`);
 
         // HOME AVATAR
-        const homeAvatar =
-            document.getElementById('homeProfileAvatar');
+        const homeAvatar = document.getElementById('homeProfileAvatar');
 
-        homeAvatar.src =
-            savedProfileImage || defaultProfile;
+        homeAvatar.src = savedProfileImage || defaultProfile;
 
         // NAV AVATAR
-        const navAvatar =
-            document.getElementById('navProfileAvatar');
+        const navAvatar = document.getElementById('navProfileAvatar');
 
-        navAvatar.src =
-            savedProfileImage || defaultProfile;
+        navAvatar.src = savedProfileImage || defaultProfile;
 
         // PLACEHOLDER
         postInput.placeholder =
@@ -384,22 +484,56 @@
 
                         </div>
 
-                        <!-- DELETE BUTTON -->
-                        <button
-                            class="btn border-0 bg-transparent p-0"
-                            onclick="deletePost('${postData.id}')">
+                       ${postData.author === username ? `
+                        <div class="position-relative">
 
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                height="24px"
-                                viewBox="0 -960 960 960"
-                                width="24px"
-                                fill="#000000">
+                            <!-- MENU BUTTON -->
+                            <button
+                                class="btn border-0 bg-transparent p-0"
+                                onclick="toggleDeleteBox('${postData.id}')">
 
-                                <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/>
-                            </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    height="24px"
+                                    viewBox="0 -960 960 960"
+                                    width="24px"
+                                    fill="#000000">
 
-                        </button>
+                                    <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/>
+                                </svg>
 
+                            </button>
+
+                            <!-- DELETE BOX -->
+                            <div
+                                id="deleteBox_${postData.id}"
+                                class="delete-box d-none">
+
+                                <p class="mb-2 small">
+                                    Delete this post?
+                                </p>
+
+                                <div class="d-flex gap-2">
+
+                                    <button
+                                        class="btn btn-danger btn-sm w-100"
+                                        onclick="deletePost('${postData.id}')">
+
+                                        Delete
+                                    </button>
+
+                                    <button
+                                        class="btn btn-secondary btn-sm w-100"
+                                        onclick="closeDeleteBox('${postData.id}')">
+
+                                        Cancel
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        ` : ''}
                     </div>
 
                     <!-- POST TEXT -->
@@ -428,21 +562,43 @@
                     <div class="post-actions d-flex justify-content-around border-top pt-2 mt-2">
 
                         <!-- LIKE -->
+                        <!-- LIKE -->
                         <button
-                            class="btn btn-link text-decoration-none text-secondary">
+                            class="btn btn-link text-decoration-none text-secondary"
+                            onclick="toggleLike('${postData.id}')">
 
-                            ❤️ Like
+                            ${
+                                postData.liked
 
+                                ?
+
+                                `
+                                <!-- LIKED -->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    height="24px"
+                                    viewBox="0 -960 960 960"
+                                    width="24px"
+                                    fill="#EA3323">
+
+                                    <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/>
+                                </svg>
+                                `
+
+                                :
+
+                                `
+                                <!-- NOT LIKED -->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    height="24px"
+                                    viewBox="0 -960 960 960"
+                                    width="24px"
+                                    fill="#000000">
+
+                                    <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/>
+                                </svg>
+                                `
+                            }
                         </button>
-
-                        <!-- COMMENT -->
-                        <button
-                            class="btn btn-link text-decoration-none text-secondary">
-
-                            💬 Comment
-
-                        </button>
-
                     </div>
                 `;
 
@@ -453,70 +609,109 @@
 
         // REMOVE IMAGE
         function removeImage() {
-
             selectedImage = null;
-
-            mediaInput.value = '';
-
-            preview.innerHTML = '';
+            mediaInput.value = "";
+            preview.innerHTML = "";
         }
 
-        // NAVIGATION
         function showPage(pageName) {
 
-            if(pageName === 'home') {
+            const home = document.getElementById('homePage');
+            const search = document.getElementById('searchPage');
 
-                window.location.href =
-                    `/home?username=${username}`;
+            if (pageName === 'home') {
+                home.classList.remove('d-none');
+                search.classList.add('d-none');
             }
 
-            if(pageName === 'profile') {
+            if (pageName === 'search') {
+                home.classList.add('d-none');
+                search.classList.remove('d-none');
+            }
 
-                window.location.href =
-                    `/profile?username=${username}`;
+            if (pageName === 'profile') {
+                window.location.href = `/profile?username=${username}`;
             }
         }
+        //
+        function handleNavHideOnScroll() {
+            let lastScrollTop = 0;
+            const nav = document.querySelector('.mobile-nav');
 
+            window.addEventListener('scroll', () => {
 
-                // CREATE POST
+                let currentScroll =
+                    window.pageYOffset || document.documentElement.scrollTop;
+
+                if (currentScroll > lastScrollTop) {
+
+                    // scrolling down → hide nav
+                    nav.classList.add('hide');
+
+                } else {
+
+                    // scrolling up → show nav
+                    nav.classList.remove('hide');
+                }
+
+                lastScrollTop =
+                    currentScroll <= 0 ? 0 : currentScroll;
+            });
+        }
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            handleNavHideOnScroll
+        );
+
+        // CREATE POST
         function addNewPost() {
 
-            const text =
-                postInput.value.trim();
+            const text = postInput.value.trim();
 
-            // CHECK EMPTY
-            if(text === '' && !selectedImage) {
-
-                alert(
-                    'Write something or add an image'
-                );
-
+            if (text === '' && !selectedImage) {
+                alert('Write something or add an image');
                 return;
             }
 
-            // NEW POST
             const newPostObject = {
-
-                id:
-                    'post_' + Date.now(),
-
-                author:
-                    username,
-
-                content:
-                    text,
-
-                image:
-                    selectedImage,
-
-                timestamp:
-                    new Date().toISOString()
+                id: 'post_' + Date.now(),
+                author: username,
+                content: text,
+                image: selectedImage || null,
+                timestamp: new Date().toISOString(),
+                liked: false
             };
+                        savedPostsArray.push(newPostObject);
 
-            // PUSH
-            savedPostsArray.push(
-                newPostObject
+            localStorage.setItem(
+                'app_feed_posts',
+                JSON.stringify(savedPostsArray)
             );
+
+            renderAllSavedPosts();
+
+            // RESET PROPERLY
+            postInput.value = '';
+            mediaInput.value = '';
+            selectedImage = null;
+            preview.innerHTML = '';
+        }
+        document.getElementById('searchInput').addEventListener('input', searchUser);
+        
+
+        // TOGGLE LIKE
+        function toggleLike(postId) {
+
+            const post =
+                savedPostsArray.find(
+                    p => p.id === postId
+                );
+
+            if (!post) return;
+
+            // TOGGLE BOOLEAN
+            post.liked = !post.liked;
 
             // SAVE
             localStorage.setItem(
@@ -526,15 +721,80 @@
 
             // RE-RENDER
             renderAllSavedPosts();
+        }
+        //SEARCH FUNCTION
+        async function searchUser() {
 
-            // RESET
-            postInput.value = '';
+            const input =
+                document.getElementById('searchInput')
+                .value
+                .trim();
 
-            mediaInput.value = '';
+            const resultBox =
+                document.getElementById('searchResult');
 
-            selectedImage = null;
+            // EMPTY INPUT
+            if (!input) {
 
-            preview.innerHTML = '';
+                resultBox.innerHTML =
+                    `<p class="text-muted">Type a username</p>`;
+
+                return;
+            }
+
+            try {
+
+                const response =
+                    await fetch(`/search-users?keyword=${input}`);
+
+                const users =
+                    await response.json();
+
+                // NO RESULTS
+                if (users.length === 0) {
+
+                    resultBox.innerHTML =
+                        `<p class="text-danger">No users found</p>`;
+
+                    return;
+                }
+
+                // CLEAR
+                resultBox.innerHTML = '';
+
+                users.forEach(user => {
+
+                    resultBox.innerHTML += `
+
+                        <div class="p-2 border rounded-3 d-flex align-items-center justify-content-between mb-2">
+
+                            <span class="fw-semibold">
+                                ${user.username}
+                            </span>
+
+                            <button
+                                class="btn btn-primary btn-sm"
+                                onclick="goToUserProfile('${user.username}')">
+
+                                View
+
+                            </button>
+
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+
+                console.log(error);
+
+                resultBox.innerHTML =
+                    `<p class="text-danger">Search failed</p>`;
+            }
+        }
+
+        function goToUserProfile(username) {
+            window.location.href = `/profile?username=${username}`;
         }
 
         // IMAGE PREVIEW
@@ -586,13 +846,37 @@
             }
         );
 
+        function toggleDeleteBox(postId) {
+
+            const box =
+                document.getElementById(`deleteBox_${postId}`);
+
+            box.classList.toggle('d-none');
+        }
+
+        function toggleDeleteBox(postId) {
+
+            const box =
+                document.getElementById(`deleteBox_${postId}`);
+
+            box.classList.toggle('d-none');
+        }
+
         // DELETE POST
         function deletePost(postId) {
 
-            const confirmDelete =
-                confirm("Delete this post?");
+            const post =
+                savedPostsArray.find(p => p.id === postId);
 
-            if(!confirmDelete) return;
+            if (!post) return;
+
+            // BLOCK NON OWNER
+            if (post.author !== username) {
+
+                alert("You can only delete your own posts.");
+
+                return;
+            }
 
             savedPostsArray =
                 savedPostsArray.filter(
@@ -624,23 +908,25 @@
         // LOGOUT
         function logout() {
 
-            const confirmLogout =
-                confirm(
-                    "Are you sure you want to logout?"
-                );
+            document.getElementById('logoutModal').style.display =
+                'flex';
+        }
 
-            if(confirmLogout) {
+        // CLOSE MODAL
+        function closeLogoutModal() {
 
-                sessionStorage.clear();
+            document.getElementById('logoutModal').style.display =
+                'none';
+        }
 
-                localStorage.removeItem(
-                    'username'
-                );
+        // CONFIRM LOGOUT
+        function confirmLogout() {
 
-                window.location.replace(
-                    "/login"
-                );
-            }
+            sessionStorage.clear();
+
+            localStorage.removeItem('username');
+
+            window.location.replace('/login');
         }
 
         // MENU

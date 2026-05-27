@@ -55,7 +55,7 @@
     height: 100vh;
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px); /* Safari support patch */
+    -webkit-backdrop-filter: blur(5px);
     display: none; /* Controlled by your JS system */
     justify-content: center;
     align-items: center;
@@ -84,9 +84,6 @@
     }
 }
 
-/* ==========================================
-   Responsive Desktop Optimization
-   ========================================== */
 @media only screen and (min-width: 641px) {
     .section-1 {
         min-height: auto;

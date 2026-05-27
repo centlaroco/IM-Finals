@@ -268,6 +268,56 @@ app.get('/profile-data', (req, res) => {
         res.json(results[0]);
     });
 });
+
+app.post('/update-profile', (req, res) => {
+
+    const { username, bio, profile_pic, cover_pic } = req.body;
+
+    const sql = `
+        UPDATE registry
+        SET bio = ?, profile_pic = ?, cover_pic = ?
+        WHERE username = ?
+    `;
+
+    connection.query(
+        sql,
+        [bio, profile_pic, cover_pic, username],
+        (err, result) => {
+
+            if (err) {
+                console.log(err);
+                return res.json({ error: "Database error" });
+            }
+
+            res.json({ success: true });
+        }
+    );
+});
+
+app.post('/add-post', (req, res) => {
+
+    const { username, content, image } = req.body;
+
+    const sql = `
+        INSERT INTO posts (username, content, image)
+        VALUES (?, ?, ?)
+    `;
+
+    connection.query(
+        sql,
+        [username, content, image],
+        (err, result) => {
+
+            if (err) {
+                console.log(err);
+                return res.json({ error: "Database error" });
+            }
+
+            res.json({ success: true });
+        }
+    );
+});
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });

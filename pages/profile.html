@@ -100,7 +100,7 @@
                     <div id="logoutModal" class="logout-modal">
                         <div class="logout-box">
                             <!-- TITLE -->
-                            <h2 class="logout-title">Do you want to log out?</h2>
+                            <h2 class="logout-title fs-4">Do you want to log out?</h2>
 
                             <!-- TEXT -->
                             <p class="logout-text">Your current session will end.</p>
@@ -142,7 +142,9 @@
                 style="width:48px; height:48px; z-index:5;"
                 onclick="openEditProfile()">
 
-                ✎
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+                    <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/>
+                </svg>
 
             </button>
 
@@ -219,68 +221,11 @@
         </div>
 
         <!-- SAMPLE POST -->
-        <div class="profile-posts">
-
-            <article class="card border-0 shadow-sm p-3 mb-3 bg-white rounded-3">
-
-                <div class="d-flex align-items-center gap-2 mb-2">
-
-                    <div class="rounded-circle overflow-hidden flex-shrink-0"
-                        style="width:42px; height:42px;">
-
-                        <img
-                            id="samplePostAvatar"
-                            src="/assets/images/profile.jpg"
-                            class="w-100 h-100 object-fit-cover"
-                        >
-
-                    </div>
-
-                    <div>
-
-                        <div class="fw-bold small">
-
-                            Vince24
-
-                        </div>
-
-                        <div class="text-muted extra-small"
-                            style="font-size:11px;">
-
-                            Just now
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="mb-3 text-dark fs-6">
-
-                    Hi, There
-
-                </div>
-
-                <div class="d-flex justify-content-around border-top pt-2">
-
-                    <button class="btn btn-link btn-sm text-decoration-none text-secondary fw-semibold">
-
-                        💛 Like
-
-                    </button>
-
-                    <button class="btn btn-link btn-sm text-decoration-none text-secondary fw-semibold">
-
-                        💬 Comment
-
-                    </button>
-
-                </div>
-
-            </article>
-
+        <!-- USER POSTS -->
+        <div
+            class="profile-posts"
+            id="profilePosts">
         </div>
-
         <!-- MODAL -->
         <div class="modal fade"
             id="editProfileModal"
@@ -383,7 +328,9 @@
             class="btn border-0 p-2"
             onclick="showPage('home')">
 
-            🏠
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+                <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/>
+            </svg>
 
         </button>
 
@@ -392,7 +339,9 @@
             class="btn border-0 p-2"
             onclick="showPage('search')">
 
-            🔍
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+                <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
+            </svg>
 
         </button>
 
@@ -416,7 +365,6 @@
 
     <!-- SCRIPT -->
     <script>
-
         // PARAMS
         const params =
             new URLSearchParams(window.location.search);
@@ -427,6 +375,10 @@
         // DEFAULT IMAGE
         const defaultProfile =
             "/assets/images/profile.jpg";
+
+        // PROFILE POSTS CONTAINER
+        const profilePosts =
+            document.getElementById('profilePosts');
 
         // FETCH USER
         fetch(`/profile-data?username=${username}`)
@@ -451,6 +403,135 @@
             console.log(error);
 
         });
+
+        // LOAD USER POSTS
+        function loadUserPosts() {
+
+            // GET POSTS
+            const allPosts =
+                JSON.parse(
+                    localStorage.getItem('app_feed_posts')
+                ) || [];
+
+            // FILTER USER POSTS
+            const userPosts =
+                allPosts.filter(
+                    post => post.author === username
+                );
+
+            // SORT POSTS
+            userPosts.sort(
+                (a, b) =>
+                new Date(b.timestamp)
+                -
+                new Date(a.timestamp)
+            );
+
+            // CLEAR POSTS
+            profilePosts.innerHTML = '';
+
+            // NO POSTS
+            if(userPosts.length === 0) {
+
+                profilePosts.innerHTML = `
+
+                    <div class="text-center text-muted mt-4">
+
+                        No posts yet
+
+                    </div>
+                `;
+
+                return;
+            }
+
+            // LOOP POSTS
+            userPosts.forEach(post => {
+
+                const savedProfile =
+                    localStorage.getItem(
+                        `profileImage_${username}`
+                    ) || defaultProfile;
+
+                const postElement =
+                    document.createElement('article');
+
+                postElement.className =
+                    'card border-0 shadow-sm p-3 mb-3 bg-white rounded-3';
+
+                postElement.innerHTML = `
+
+                    <!-- TOP -->
+                    <div class="d-flex align-items-center gap-2 mb-2">
+
+                        <div
+                            class="rounded-circle overflow-hidden flex-shrink-0"
+                            style="width:42px; height:42px;">
+
+                            <img
+                                src="${savedProfile}"
+                                class="w-100 h-100 object-fit-cover"
+                            >
+
+                        </div>
+
+                        <div>
+
+                            <div class="fw-bold small">
+
+                                ${post.author}
+
+                            </div>
+
+                            <div
+                                class="text-muted"
+                                style="font-size:11px;">
+
+                                ${new Date(post.timestamp).toLocaleString()}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- POST TEXT -->
+                    <div class="mb-3 text-dark fs-6">
+
+                        ${post.content}
+
+                    </div>
+
+                    <!-- POST IMAGE -->
+                    ${post.image ?
+
+                    `
+                    <img
+                        src="${post.image}"
+                        class="img-fluid rounded-3 mb-3"
+                    >
+                    `
+
+                    : ''}
+
+                    <!-- ACTIONS -->
+                    <div class="d-flex justify-content-around border-top pt-2">
+
+                        <button
+                            class="btn btn-link btn-sm text-decoration-none text-secondary fw-semibold">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+                                <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/>
+                            </svg>
+
+                        </button>
+
+                    </div>
+                `;
+
+                profilePosts.appendChild(postElement);
+            });
+        }
 
         // MENU
         function toggleMenu() {
@@ -498,6 +579,7 @@
         }
 
         // NAVIGATION
+        // NAVIGATION
         function showPage(pageName) {
 
             if(pageName === 'home') {
@@ -517,6 +599,19 @@
                 window.location.href =
                     `/home?username=${username}`;
             }
+        }
+
+        // OPEN EDIT MODAL
+        function openEditProfile() {
+
+            const modal =
+                new bootstrap.Modal(
+                    document.getElementById(
+                        'editProfileModal'
+                    )
+                );
+
+            modal.show();
         }
 
         // LOGOUT
@@ -541,11 +636,14 @@
         }
 
         // OPEN MODAL
+        // OPEN EDIT MODAL
         function openEditProfile() {
 
             const modal =
                 new bootstrap.Modal(
-                    document.getElementById('editProfileModal')
+                    document.getElementById(
+                        'editProfileModal'
+                    )
                 );
 
             modal.show();
@@ -581,19 +679,12 @@
                 reader.onload =
                     function(e) {
 
-                    // MAIN PROFILE
                     document.getElementById('profileAvatar').src =
                         e.target.result;
 
-                    // NAV PROFILE
                     document.getElementById('navProfileAvatar').src =
                         e.target.result;
 
-                    // SAMPLE POST
-                    document.getElementById('samplePostAvatar').src =
-                        e.target.result;
-
-                    // SAVE
                     localStorage.setItem(
                         `profileImage_${username}`,
                         e.target.result
@@ -669,9 +760,6 @@
                     document.getElementById('navProfileAvatar').src =
                         savedProfile;
 
-                    document.getElementById('samplePostAvatar').src =
-                        savedProfile;
-
                 } else {
 
                     document.getElementById('profileAvatar').src =
@@ -679,18 +767,14 @@
 
                     document.getElementById('navProfileAvatar').src =
                         defaultProfile;
-
-                    document.getElementById('samplePostAvatar').src =
-                        defaultProfile;
                 }
 
-                // COVER
+                // COVER IMAGE
                 const coverImage =
                     document.getElementById('coverImage');
 
                 if(savedCover) {
 
-                    // SHOW SAVED COVER
                     coverImage.src =
                         savedCover;
 
@@ -699,15 +783,15 @@
 
                 } else {
 
-                    // NO COVER IMAGE
-                    // HIDE IMAGE AND USE BLACK BACKGROUND
                     coverImage.style.display =
                         'none';
                 }
+
+                // LOAD POSTS
+                loadUserPosts();
+
             }
         );
-
     </script>
-
 </body>
 </html>
