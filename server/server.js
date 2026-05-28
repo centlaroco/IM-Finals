@@ -318,6 +318,74 @@ app.post('/add-post', (req, res) => {
     );
 });
 
+
+// Place this route handler inside your server file with your other POST routes
+app.use(express.json()); // Essential if it isn't already added to top of file to read JSON headers
+
+app.post('/change-password', (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.json({ error: "Missing required fields" });
+    }
+
+    const sql = `
+        UPDATE registry
+        SET password = ?
+        WHERE username = ?
+    `;
+
+    connection.query(sql, [password, username], (err, result) => {
+        if (err) {
+            console.log(err);
+            return res.json({ error: "Database exception error occurs" });
+        }
+
+        // Check if a row was actually found and altered
+        if (result.affectedRows === 0) {
+            return res.json({ error: "User context not found" });
+        }
+
+        console.log(`Password updated directly for user: ${username}`);
+        return res.json({ success: true });
+    });
+});
+
+app.post('/delete-account', (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.json({ error: "Username and password verification fields are required." });
+    }
+
+    // Step 1: Verify identity via username AND password 
+    const verifySql = `SELECT * FROM registry WHERE username = ? AND password = ?`;
+    
+    connection.query(verifySql, [username, password], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.json({ error: "Database authentication error." });
+        }
+
+        if (results.length === 0) {
+            return res.json({ error: "Incorrect password verification." });
+        }
+
+        // Step 2: Delete from table if credentials checked out successfully
+        const deleteSql = `DELETE FROM registry WHERE username = ?`;
+        
+        connection.query(deleteSql, [username], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.json({ error: "Failed to clear registry records." });
+            }
+
+            console.log(`Account permanently deleted for user: ${username}`);
+            return res.json({ success: true });
+        });
+    });
+});
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
