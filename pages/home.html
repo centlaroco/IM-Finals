@@ -86,13 +86,11 @@
             </button>
 
             <button
-                id="logoutBtn"
-                onclick="logout()"
-                class="btn btn-secondary w-100 btn-sm">
+                    class="btn btn-danger w-100 btn-sm"
+                    onclick="logout(event)">
 
-                Logout
-            </button>
-
+                    Logout
+                </button>
             <!-- LOGOUT MODAL -->
             <div id="logoutModal" class="logout-modal">
 
@@ -115,10 +113,8 @@
                         <button
                             class="logout-yes"
                             onclick="confirmLogout()">
-
                             Yes
                         </button>
-
                         <!-- NO -->
                         <button
                             class="logout-no"
@@ -351,19 +347,27 @@
         // DEFAULT IMAGE
         const defaultProfile = "/assets/images/profile.jpg";
 
-        // SAVED PROFILE IMAGE
         const savedProfileImage = localStorage.getItem(`profileImage_${username}`);
 
-        // HOME AVATAR
         const homeAvatar = document.getElementById('homeProfileAvatar');
-
         homeAvatar.src = savedProfileImage || defaultProfile;
 
-        // NAV AVATAR
         const navAvatar = document.getElementById('navProfileAvatar');
+        navAvatar.src = savedProfileImage || defaultProfile;
 
         navAvatar.src = savedProfileImage || defaultProfile;
 
+        document.addEventListener(
+            "DOMContentLoaded",
+            async () => {
+
+                await loadUserProfileImages();
+
+                fetchPosts();
+
+                handleNavHideOnScroll();
+            }
+        );
         // PLACEHOLDER
         postInput.placeholder =
             username !== "User"
@@ -376,14 +380,19 @@
                 localStorage.getItem('app_feed_posts')
             ) || [];
 
-        // LOAD POSTS
-        document.addEventListener(
-            "DOMContentLoaded",
-            () => {
+        async function loadNavbarProfile() {
+            try {
+                const res = await fetch(`/profile-data?username=${username}`);
+                const user = await res.json();
 
-                renderAllSavedPosts();
+                const avatar = user.profile_pic || "/assets/images/profile.jpg";
+
+                document.getElementById('navProfileAvatar').src = avatar;
+
+            } catch (err) {
+                console.log(err);
             }
-        );
+        }
 
         // TIME FORMAT
         function formatTimestamp(timestamp) {
@@ -415,197 +424,107 @@
 
             return `${diffInDays}d`;
         }
+        
+        // LOAD PROFILE IMAGES
+        async function loadUserProfileImages() {
+
+            try {
+
+                const response =
+                    await fetch(`/profile-data?username=${username}`);
+
+                const user = await response.json();
+
+                const avatar =
+                    user.profile_pic || defaultProfile;
+
+                document.getElementById('homeProfileAvatar').src = avatar;
+
+                document.getElementById('navProfileAvatar').src = avatar;
+
+            } catch(error) {
+
+                console.log(error);
+            }
+        }
+
+        async function fetchPosts() {
+            try {
+                const response = await fetch('/posts');
+                const postsData = await response.json();
+                
+                if(postsData.error) {
+                    console.log(postsData.error);
+                    return;
+                }
+                
+                renderAllSavedPosts(postsData); // Pass data to render function
+            } catch (error) {
+                console.log("Error fetching posts:", error);
+            }
+        }
 
         // RENDER POSTS
-        function renderAllSavedPosts() {
+        function renderAllSavedPosts(postArray) {
 
             postsContainer.innerHTML = '';
 
-            // SORT POSTS
-            savedPostsArray.sort(
-                (a, b) =>
-                new Date(b.timestamp)
-                -
-                new Date(a.timestamp)
-            );
+            postArray.reverse().forEach(postData => {
 
-            // LOOP POSTS
-            savedPostsArray.forEach(postData => {
-
-                // PROFILE IMAGE
                 const currentProfileImage =
-                    localStorage.getItem(
-                        `profileImage_${postData.author}`
-                    ) || defaultProfile;
+                    postData.profile_pic || defaultProfile;
 
-                // CREATE POST
-                const postElement =
-                    document.createElement('div');
+                const postElement = document.createElement('div');
 
                 postElement.className =
                     'post rounded-4 p-3 mb-3 shadow-sm border-0';
 
-                // POST HTML
                 postElement.innerHTML = `
+                    <div class="d-flex align-items-center gap-2 mb-2">
 
-                    <!-- POST TOP -->
-                    <div class="post-top d-flex align-items-start justify-content-between mb-2">
+                        <img
+                            src="${currentProfileImage}"
+                            class="rounded-circle object-fit-cover"
+                            style="width:42px; height:42px;"
+                        >
 
-                        <!-- LEFT -->
-                        <div class="d-flex align-items-center gap-2">
-
-                            <!-- PROFILE -->
-                            <img
-                                src="${currentProfileImage}"
-                                class="rounded-circle object-fit-cover"
-                                style="width:42px; height:42px;"
-                            >
-
-                            <!-- USER -->
-                            <div class="post-user">
-
-                                <!-- NAME -->
-                                <div class="username fw-semibold fs-6">
-
-                                    ${postData.author}
-
-                                </div>
-
-                                <!-- TIME -->
-                                <div
-                                    class="time small text-muted post-time"
-                                    data-timestamp="${postData.timestamp}">
-
-                                    ${formatTimestamp(postData.timestamp)}
-
-                                </div>
-
+                        <div>
+                            <div class="fw-semibold">
+                                ${postData.username}
                             </div>
 
-                        </div>
-
-                       ${postData.author === username ? `
-                        <div class="position-relative">
-
-                            <!-- MENU BUTTON -->
-                            <button
-                                class="btn border-0 bg-transparent p-0"
-                                onclick="toggleDeleteBox('${postData.id}')">
-
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    height="24px"
-                                    viewBox="0 -960 960 960"
-                                    width="24px"
-                                    fill="#000000">
-
-                                    <path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/>
-                                </svg>
-
-                            </button>
-
-                            <!-- DELETE BOX -->
-                            <div
-                                id="deleteBox_${postData.id}"
-                                class="delete-box d-none">
-
-                                <p class="mb-2 small">
-                                    Delete this post?
-                                </p>
-
-                                <div class="d-flex gap-2">
-
-                                    <button
-                                        class="btn btn-danger btn-sm w-100"
-                                        onclick="deletePost('${postData.id}')">
-
-                                        Delete
-                                    </button>
-
-                                    <button
-                                        class="btn btn-secondary btn-sm w-100"
-                                        onclick="closeDeleteBox('${postData.id}')">
-
-                                        Cancel
-                                    </button>
-
-                                </div>
-
+                            <div class="small text-muted">
+                                ${formatTimestamp(postData.timestamp)}
                             </div>
-
                         </div>
-                        ` : ''}
-                    </div>
-
-                    <!-- POST TEXT -->
-                    <div
-                        class="post-text mb-2 fs-6 text-break"
-                        style="line-height:1.6; color:#111;">
-
-                        ${postData.content}
 
                     </div>
 
-                    <!-- IMAGE -->
-                    ${postData.image ?
-
-                    `
-                    <img
-                        src="${postData.image}"
-                        class="img-fluid rounded-3 mb-2 w-100 object-fit-cover"
-                        style="max-height:300px;"
-                    >
-                    `
-
-                    : ''}
-
-                    <!-- ACTIONS -->
-                    <div class="post-actions d-flex justify-content-around border-top pt-2 mt-2">
-
-                        <!-- LIKE -->
-                        <!-- LIKE -->
-                        <button
-                            class="btn btn-link text-decoration-none text-secondary"
-                            onclick="toggleLike('${postData.id}')">
-
-                            ${
-                                postData.liked
-
-                                ?
-
-                                `
-                                <!-- LIKED -->
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    height="24px"
-                                    viewBox="0 -960 960 960"
-                                    width="24px"
-                                    fill="#EA3323">
-
-                                    <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/>
-                                </svg>
-                                `
-
-                                :
-
-                                `
-                                <!-- NOT LIKED -->
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    height="24px"
-                                    viewBox="0 -960 960 960"
-                                    width="24px"
-                                    fill="#000000">
-
-                                    <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/>
-                                </svg>
-                                `
-                            }
-                        </button>
+                    <div class="post-text mt-2">
+                        ${postData.content || ''}
                     </div>
+
+                    ${postData.image ? `
+                        <img
+                            src="${postData.image}"
+                            class="img-fluid rounded-3 mt-2 w-100"
+                            style="max-height:400px; object-fit:cover;"
+                        >
+                    ` : ''}
+
+                    
                 `;
 
-                // APPEND
                 postsContainer.appendChild(postElement);
             });
         }
+
+        function openSearchPage() {
+    document.getElementById('homePage').classList.add('d-none');
+    document.getElementById('searchPage').classList.remove('d-none');
+
+    document.getElementById('searchInput').focus();
+}
 
         // REMOVE IMAGE
         function removeImage() {
@@ -633,7 +552,8 @@
                 window.location.href = `/profile?username=${username}`;
             }
         }
-        //
+        
+        // NAV HIDE ON SCROLL
         function handleNavHideOnScroll() {
             let lastScrollTop = 0;
             const nav = document.querySelector('.mobile-nav');
@@ -665,7 +585,7 @@
         );
 
         // CREATE POST
-        function addNewPost() {
+        async function addNewPost() {
 
             const text = postInput.value.trim();
 
@@ -674,54 +594,71 @@
                 return;
             }
 
-            const newPostObject = {
-                id: 'post_' + Date.now(),
-                author: username,
-                content: text,
-                image: selectedImage || null,
-                timestamp: new Date().toISOString(),
-                liked: false
-            };
-                        savedPostsArray.push(newPostObject);
+            try {
 
-            localStorage.setItem(
-                'app_feed_posts',
-                JSON.stringify(savedPostsArray)
-            );
+                const response = await fetch('/add-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        content: text,
+                        image: selectedImage
+                    })
+                });
 
-            renderAllSavedPosts();
+                const result = await response.json();
 
-            // RESET PROPERLY
-            postInput.value = '';
-            mediaInput.value = '';
-            selectedImage = null;
-            preview.innerHTML = '';
+                if(result.error) {
+                    alert(result.error);
+                    return;
+                }
+
+                // reload posts
+                fetchPosts();
+
+                // reset fields
+                postInput.value = '';
+                mediaInput.value = '';
+                selectedImage = null;
+                preview.innerHTML = '';
+
+            } catch(error) {
+
+                console.log(error);
+                alert("Failed to add post");
+            }
         }
-        document.getElementById('searchInput').addEventListener('input', searchUser);
-        
+        document.getElementById('searchInput').addEventListener('input', searchUser);        
 
         // TOGGLE LIKE
-        function toggleLike(postId) {
+        async function toggleLike(postId) {
+            try {
+                const response = await fetch('/like-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        postId: postId
+                    })
+                });
 
-            const post =
-                savedPostsArray.find(
-                    p => p.id === postId
-                );
+                const result = await response.json();
 
-            if (!post) return;
+                if(result.error) {
+                    alert(result.error);
+                    return;
+                }
+                fetchPosts();
+            } catch(error) {
 
-            // TOGGLE BOOLEAN
-            post.liked = !post.liked;
-
-            // SAVE
-            localStorage.setItem(
-                'app_feed_posts',
-                JSON.stringify(savedPostsArray)
-            );
-
-            // RE-RENDER
-            renderAllSavedPosts();
+                console.log(error);
+                alert("Failed to like post");
+            }
         }
+
         //SEARCH FUNCTION
         async function searchUser() {
 
@@ -730,12 +667,10 @@
                 .value
                 .trim();
 
-            const resultBox =
-                document.getElementById('searchResult');
+            const resultBox = document.getElementById('searchResult');
 
             // EMPTY INPUT
             if (!input) {
-
                 resultBox.innerHTML =
                     `<p class="text-muted">Type a username</p>`;
 
@@ -743,19 +678,14 @@
             }
 
             try {
+                const response = await fetch(`/search-users?keyword=${input}`);
 
-                const response =
-                    await fetch(`/search-users?keyword=${input}`);
-
-                const users =
-                    await response.json();
+                const users = await response.json();
 
                 // NO RESULTS
                 if (users.length === 0) {
-
                     resultBox.innerHTML =
                         `<p class="text-danger">No users found</p>`;
-
                     return;
                 }
 
@@ -763,7 +693,6 @@
                 resultBox.innerHTML = '';
 
                 users.forEach(user => {
-
                     resultBox.innerHTML += `
 
                         <div class="p-2 border rounded-3 d-flex align-items-center justify-content-between mb-2">
@@ -785,9 +714,7 @@
                 });
 
             } catch (error) {
-
                 console.log(error);
-
                 resultBox.innerHTML =
                     `<p class="text-danger">Search failed</p>`;
             }
@@ -797,98 +724,45 @@
             window.location.href = `/profile?username=${username}`;
         }
 
-        // IMAGE PREVIEW
-        mediaInput.addEventListener(
-            'change',
-            (e) => {
-
-                const file =
-                    e.target.files[0];
-
-                // NO FILE
-                if(!file) return;
-
-                const reader =
-                    new FileReader();
-
-                reader.onload =
-                    function(event) {
-
-                    selectedImage =
-                        event.target.result;
-
-                    // PREVIEW
-                    preview.innerHTML = `
-
-                        <div class="position-relative mt-2">
-
-                            <img
-                                src="${selectedImage}"
-                                class="img-fluid rounded-3 w-100 object-fit-cover"
-                                style="max-height:250px;"
-                            >
-
-                            <!-- REMOVE -->
-                            <button
-                                class="btn btn-danger position-absolute top-0 end-0 m-2 rounded-circle"
-                                onclick="removeImage()">
-
-                                ✖
-
-                            </button>
-
-                        </div>
-                    `;
-                };
-
-                // READ FILE
-                reader.readAsDataURL(file);
-            }
-        );
-
         function toggleDeleteBox(postId) {
-
-            const box =
-                document.getElementById(`deleteBox_${postId}`);
-
+            const box = document.getElementById(`deleteBox_${postId}`);
             box.classList.toggle('d-none');
         }
 
         function toggleDeleteBox(postId) {
-
-            const box =
-                document.getElementById(`deleteBox_${postId}`);
-
+            const box = document.getElementById(`deleteBox_${postId}`);
             box.classList.toggle('d-none');
         }
 
         // DELETE POST
-        function deletePost(postId) {
+        async function deletePost(postId) {
+            try {
 
-            const post =
-                savedPostsArray.find(p => p.id === postId);
+                const response = await fetch('/delete-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: postId,
+                        username: username
+                    })
+                });
 
-            if (!post) return;
+                const result = await response.json();
 
-            // BLOCK NON OWNER
-            if (post.author !== username) {
+                if(result.error) {
+                    alert(result.error);
+                    return;
+                }
 
-                alert("You can only delete your own posts.");
+                fetchPosts();
 
-                return;
+            } catch(error) {
+
+                console.log(error);
+                alert("Failed to delete post");
             }
-
-            savedPostsArray =
-                savedPostsArray.filter(
-                    post => post.id !== postId
-                );
-
-            localStorage.setItem(
-                'app_feed_posts',
-                JSON.stringify(savedPostsArray)
-            );
-
-            renderAllSavedPosts();
         }
         // PROFILE
         function goToProfile() {
@@ -906,38 +780,29 @@
         }
 
         // LOGOUT
-        function logout() {
+        function logout(event) {
 
-            document.getElementById('logoutModal').style.display =
-                'flex';
+            if(event) {
+                event.stopPropagation();
+            }
+            document.getElementById('logoutModal').style.display = 'flex';
         }
-
         // CLOSE MODAL
         function closeLogoutModal() {
-
-            document.getElementById('logoutModal').style.display =
-                'none';
+            document.getElementById('logoutModal').style.display = 'none';
         }
 
         // CONFIRM LOGOUT
         function confirmLogout() {
-
             sessionStorage.clear();
-
             localStorage.removeItem('username');
-
             window.location.replace('/login');
         }
 
         // MENU
-        const menuBtn =
-            document.getElementById('menu');
-
-        const closeBtn =
-            document.getElementById('close-menu');
-
-        const dropdown =
-            document.getElementById('dropdownMenu');
+        const menuBtn = document.getElementById('menu');
+        const closeBtn = document.getElementById('close-menu');
+        const dropdown = document.getElementById('dropdownMenu');
 
         // OPEN
         menuBtn.addEventListener(

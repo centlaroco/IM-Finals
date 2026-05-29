@@ -72,7 +72,6 @@
     font-weight: 600;
 }
 
-/* Decorative 'or' splitter styling */
 .login-or-register {
     display: flex;
     justify-content: center;
