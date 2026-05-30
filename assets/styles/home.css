@@ -138,6 +138,13 @@ textarea {
     display: flex !important;
 }
 
+.dropdown-menu.active {
+            display: flex !important;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
 /* DELETE BOX */
 .delete-box {
     position: absolute;
